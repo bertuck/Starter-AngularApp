@@ -1,35 +1,57 @@
 import angular from 'angular';
 
-// angular modules
-import constants from './constants';
-import onConfig  from './on_config';
-import onRun     from './on_run';
 import 'angular-ui-router';
 import './templates';
-import './filters';
-import './controllers';
-import './services';
-import './directives';
+import './config';
+import './components/query';
+import './components/mainNav';
+import './components/more';
 
-// create and bootstrap application
-const requires = [
-  'ui.router',
-  'templates',
-  'app.filters',
-  'app.controllers',
-  'app.services',
-  'app.directives'
-];
 
-// mount on window for testing
-window.app = angular.module('app', requires);
+(function() {
+    /**
+     * Definition of the main app module and its dependencies
+     */
+    angular.module('angularApp', [
+        'ui.router',
+        'templates',
+        'angularApp.constants',
+        'angularApp.query',
+        'angularApp.mainNav',
+        'angularApp.more',
+    ])
 
-angular.module('app').constant('AppSettings', constants);
+        .config([
+            '$stateProvider',
+            '$locationProvider',
+            function ($stateProvider, $locationProvider) {
+                $stateProvider
+                    .state('Home', {
+                        url: '/',
+                        templateUrl: 'pages/home.html',
+                        controllerAs: 'main',
+                        title: 'Home'
+                    })
+                    .state('More', {
+                        url: '/more',
+                        templateUrl: 'pages/more.html',
+                        controller: 'MoreController',
+                        controllerAs: 'main',
+                        title: 'More'
+                    })
+                    .state('404server', {
+                        templateUrl: 'pages/404.html'
+                    })
+                    .state('404client', {
+                        url: '*path',
+                        templateUrl: 'pages/404.html'
+                    });
 
-angular.module('app').config(onConfig);
+                $locationProvider.html5Mode(true).hashPrefix('');
+            }]);
 
-angular.module('app').run(onRun);
+    angular.bootstrap(document, ['angularApp'], {
+        strictDi: true
+    });
 
-angular.bootstrap(document, ['app'], {
-  strictDi: true
-});
+})();
